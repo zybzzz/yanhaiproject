@@ -1,0 +1,6 @@
+database:
+  user: root
+  password: zyb629225
+  server: 127.0.0.1
+  port: 3306
+  dbName: yanhai
