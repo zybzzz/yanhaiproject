@@ -1,10 +1,10 @@
 package model
 
 type Picture struct {
-	PicId  int
-	PicURL string
+	PicId  int `gorm:"primaryKey"`
+	PicURL string `gorm:"column:pic_url"`
 }
 
 func (Picture) TableName() string {
-	return "Picture"
+	return "picture"
 }

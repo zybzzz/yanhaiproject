@@ -1,15 +1,15 @@
 package model
 
 type Comment struct {
-	CommentId    int
+	CommentId    int `gorm:"primaryKey"`
 	CommentusrId string
 	TopicId      int
 	Content      string
-	picId        string
+	PicId        string
 }
 
 //映射到数据库表名
 func (Comment) TableName() string {
-	return "Comment"
+	return "comment"
 }
 
