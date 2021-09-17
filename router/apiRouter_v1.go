@@ -29,7 +29,7 @@ func ApiV1RouterInit(engine *gin.Engine)  {
 		//	更改我的信息
 		apiV1Router.PUT("/changeMyMess", controller.UserController{}.ChangeMyMess)
 		//	获取我发布的帖子
-		apiV1Router.GET("/getMyReleaseList/:userId", controller.UserController{}.GetMyReleaseList)
+		apiV1Router.GET("/getMyReleaseList", controller.UserController{}.GetMyReleaseList)
 		//	登录
 		apiV1Router.GET("/login", controller.LoginController{}.Login)
 		//	注册
