@@ -7,7 +7,7 @@ type User struct {
 	UserId      string `gorm:"primaryKey" json:"userId"`
 	Password    string `json:"password"`
 	Nickname    string `json:"nickname"`
-	Gender      int
+	Gender      string `json:"gender"`
 	School      string `json:"school"`
 	Major       string `json:"major"`
 	PortraitId  int

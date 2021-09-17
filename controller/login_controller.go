@@ -50,6 +50,9 @@ func (con LoginController) Register(context *gin.Context)  {
 				"userId": user.UserId,
 			})
 		}else {
+			context.JSON(http.StatusOK, gin.H{
+				"status": "fail",
+			})
 			log.Error("插入数据出现错误  " + result.Error.Error())
 		}
 	}

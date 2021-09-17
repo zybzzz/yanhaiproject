@@ -6,5 +6,4 @@ type PictureController struct {
 }
 
 func (con PictureController) UploadPicture(context *gin.Context)  {
-
 }

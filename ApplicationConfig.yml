@@ -4,3 +4,11 @@ database:
   server: 127.0.0.1
   port: 3306
   dbName: yanhai
+
+# 运行环境 开发dev 部署prod
+runenv: dev
+
+# 不同环境的存储路径
+picpath:
+  devpath: ./testpic/
+  prodpath: /home/pic/
