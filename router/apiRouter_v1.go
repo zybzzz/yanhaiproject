@@ -37,7 +37,7 @@ func ApiV1RouterInit(engine *gin.Engine)  {
 		//	获取帖子详细信息
 		apiV1Router.GET("/getTopicDetail/:topicId", controller.TopicController{}.GetTopicDetail)
 		//	发布帖子
-		apiV1Router.GET("/releaseTopic", controller.TopicController{}.ReleaseTopic)
+		apiV1Router.POST("/releaseTopic", controller.TopicController{}.ReleaseTopic)
 		//	上传图片
 		apiV1Router.POST("/uploadPicture", controller.PictureController{}.UploadPicture)
 		//	评论

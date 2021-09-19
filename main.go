@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"yanhaiproject/middlewares"
 	"yanhaiproject/router"
 	log "github.com/sirupsen/logrus"
 )
@@ -12,6 +13,7 @@ import (
 func main() {
 	engine := gin.Default()
 	log.Info("nihao")
+	engine.Use(middlewares.Cors())
 	router.ApiV1RouterInit(engine)
 
 	//FIXME 补充端口信息

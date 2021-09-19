@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 	"yanhaiproject/core"
 	"yanhaiproject/model"
 )
@@ -119,6 +120,26 @@ func (con TopicController) GetTopicDetail(context *gin.Context)  {
 	context.JSON(http.StatusOK, retTopicDetail)
 }
 
-func (con TopicController) ReleaseTopic(context *gin.Context)  {
 
+//FIXME 存在自增问题
+func (con TopicController) ReleaseTopic(context *gin.Context)  {
+	var topic model.Topic
+	if err := context.ShouldBindJSON(&topic); err != nil{
+		log.Error(err.Error())
+		context.JSON(http.StatusOK,gin.H{
+			"status": "fail",
+		})
+		return
+	}
+	topic.CreateAt = time.Now()
+	log.Info("即将存入数据库的帖子是")
+	log.Info(topic)
+	result := core.DB.Create(&topic)
+	if result.Error != nil {
+		log.Error(result.Error.Error())
+	}
+	log.Info(result.RowsAffected)
+	context.JSON(http.StatusOK,gin.H{
+		"status": "success",
+	})
 }
