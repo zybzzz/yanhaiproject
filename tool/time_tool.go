@@ -22,6 +22,10 @@ func GetUnix() int64 {
 	return time.Now().Unix()
 }
 
+func GetUnixNano() int64 {
+	return time.Now().UnixNano()
+}
+
 // 获取常规格式日期
 func GetDate() string {
 	template := "2006-01-02 15:04:05"

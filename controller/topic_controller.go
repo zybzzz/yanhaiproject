@@ -78,6 +78,7 @@ func (con TopicController) GetTopicDetail(context *gin.Context)  {
 	retTopicDetail.ThumpUp = topic.ThumpUp
 
 	//获取返回的图片列表
+	//FIXME 增加对图片路径的拼接
 	topicPicIds := strings.Split(topic.PicId, "|")
 	picIds := make([]int, len(topicPicIds))
 	for index, str := range topicPicIds{
@@ -133,11 +134,14 @@ func (con TopicController) ReleaseTopic(context *gin.Context)  {
 	}
 	topic.CreateAt = time.Now()
 	log.Info("即将存入数据库的帖子是")
+	log.Info("插入之前")
 	log.Info(topic)
 	result := core.DB.Create(&topic)
 	if result.Error != nil {
 		log.Error(result.Error.Error())
 	}
+	log.Info("插入之后")
+	log.Info(topic)
 	log.Info(result.RowsAffected)
 	context.JSON(http.StatusOK,gin.H{
 		"status": "success",

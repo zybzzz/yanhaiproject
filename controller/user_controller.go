@@ -58,7 +58,7 @@ func (con UserController) GetMyReleaseList(context *gin.Context)  {
 		retTopics[index].ThumpUp = topic.ThumpUp
 		//FIXME 暂时写死 在评论的时候直接设置字段自增 等待优化
 		retTopics[index].RecommendNum = 20
-		//FIXME 直接存储URL 等待优化
+		//FIXME 等待数据库更新造用户的头像数据
 		retTopics[index].Portrait = "http://xxx.xxx.xxx"
 	}
 

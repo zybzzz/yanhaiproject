@@ -54,7 +54,6 @@ func init()  {
 	fmt.Println(dsn)
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		//FIXME 更改为log打印日志
 		log.Printf("连接数据库失败: %v\n", err)
 		log.Panic("连接数据库失败，程序崩溃")
 	}

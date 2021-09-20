@@ -50,7 +50,8 @@ func (con SchoolGroupController) GetGroupDetail(context *gin.Context)  {
 	retGroupDetail.SchoolPortraitURL = "http://www.xxx.com"
 	//查询出该小组相关信息
 	var group model.Group
-	core.DB.First(&group, strconv.Atoi(groupId))
+	iGroupId, _ := strconv.Atoi(groupId)
+	core.DB.First(&group, iGroupId)
 	retGroupDetail.School = group.GroupSchool
 	retGroupDetail.ResourceNum = 2
 	retGroupDetail.ResourceList = []string{retGroupDetail.School + "上岸技巧", retGroupDetail.School + "考研资料"}
@@ -64,7 +65,7 @@ func (con SchoolGroupController) GetGroupDetail(context *gin.Context)  {
 	}
 	//返回组中的帖子
 	var topicsInGroup []model.Topic
-	core.DB.Where(map[string]interface{}{"group_id":strconv.Atoi(groupId)}).Find(&topicsInGroup)
+	core.DB.Where(map[string]interface{}{"group_id":iGroupId}).Find(&topicsInGroup)
 	retTopicInDetails := make([]retTopicInDetail, len(topicsInGroup))
 	for index,topic := range topicsInGroup{
 		retTopicInDetails[index].CreateTime = topic.CreateAt.Format("2006-01-02")

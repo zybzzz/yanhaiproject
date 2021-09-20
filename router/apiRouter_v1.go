@@ -14,7 +14,6 @@ const PREFIX_URL = "/api/v1"
 func ApiV1RouterInit(engine *gin.Engine)  {
 	apiV1Router := engine.Group(PREFIX_URL)
 	{
-		//	TODO 仍然缺省控制器实现
 
 		//	获取推荐了列表
 		apiV1Router.GET("/getRecommendList", controller.IndexPageController{}.GetRecommendList)

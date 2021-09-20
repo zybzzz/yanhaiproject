@@ -11,4 +11,4 @@ runenv: dev
 # 不同环境的存储路径
 picpath:
   devpath: ./testpic/
-  prodpath: /home/pic/
+  prodpath: /home/yanhaipic/

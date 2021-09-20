@@ -6,6 +6,7 @@ import (
 	"path"
 	"strconv"
 	"yanhaiproject/core"
+	"yanhaiproject/model"
 	"yanhaiproject/tool"
 	log "github.com/sirupsen/logrus"
 )
@@ -49,15 +50,15 @@ func (PictureService) PicIdsToURL(picIds string) []string  {
  * @param context 上下文
  * @return mess 回传消息 isSuccess是否上传成功
  **/
-func StorePictures(context *gin.Context) (mess string, isSuccess bool) {
-	//FIXME 等待接口测试
+func StorePictures(context *gin.Context) (mess string, isSuccess bool, ids []int) {
+	//接口测试通过
 	//提前构造存储目录
 	runenv := core.ApplicationConfig.GetString("runenv")
 	var dirPath string
 	if runenv == "dev" {
-		dirPath = core.ApplicationConfig.GetString("devpath")
+		dirPath = core.ApplicationConfig.GetString("picpath.devpath")
 	} else if dirPath == "prod" {
-		dirPath = core.ApplicationConfig.GetString("prodpath")
+		dirPath = core.ApplicationConfig.GetString("picpath.prodpath")
 	}else {
 		mess = "文件服务器出错"
 		isSuccess = false
@@ -66,7 +67,9 @@ func StorePictures(context *gin.Context) (mess string, isSuccess bool) {
 
 	form, _ := context.MultipartForm()
 	files := form.File["files"]
-	for _, file := range files{
+	//创建等同长度的数据用来存储文件存储成功之后返回的id
+	picIds := make([]int, len(files))
+	for index, file := range files{
 		//获取判断扩展名是否合法
 		extName := path.Ext(file.Filename)
 		allowExtMap := map[string]bool{
@@ -79,34 +82,43 @@ func StorePictures(context *gin.Context) (mess string, isSuccess bool) {
 		if _, isAllow := allowExtMap[extName]; !isAllow {
 			mess = "文件名称不合法"
 			isSuccess = false
+			ids = nil
 			return
 		}
 
 		//构造存储目录
 		day := tool.GetDay()
-		dirPath += day
+		createDirPath := dirPath + day
 
-		if err:= os.MkdirAll(dirPath, 0666); err != nil{
+		if err:= os.MkdirAll(createDirPath, 0777); err != nil{
 			log.Error(err)
 			mess = "文件服务器出错"
 			isSuccess = false
+			ids = nil
 			return
 		}
 
-		//重新生成文件名
-		fileUnixName := strconv.FormatInt(tool.GetUnix(), 10)
-		saveDst := path.Join(dirPath, fileUnixName + extName)
+		//重新生成文件名 运行速度快 需要获取纳秒时间才行
+		fileUnixName := strconv.FormatInt(tool.GetUnixNano(), 10)
+		saveDst := path.Join(createDirPath, fileUnixName + extName)
 		err := context.SaveUploadedFile(file, saveDst)
-		//FIXME 记录数据库文件存储
+		//记录数据库文件存储
 		if err != nil {
 			//出错处理
 			mess = "存储失败"
 			isSuccess = false
+			ids = nil
 			log.Error(err)
 			return
 		}else {
 			//保存图片信息至数据库
+			var picture model.Picture
+			picture.PicURL = path.Join(day, fileUnixName + extName)
+			log.Info("保存在数据库中的图片地址将为")
+			log.Info(picture.PicURL)
+			core.DB.Create(&picture)
+			picIds[index] = picture.PicId
 		}
 	}
-	return "成功",true
+	return "成功",true, picIds
 }

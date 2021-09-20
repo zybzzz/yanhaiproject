@@ -15,5 +15,7 @@
 # vendor/
 .idea
 tmp
-
+# 打包可执行文件不上传
 main
+# 测试图片接口文件不上传
+testpic
