@@ -7,7 +7,9 @@ import (
 	"strings"
 	"yanhaiproject/core"
 	"yanhaiproject/model"
+	"yanhaiproject/service"
 	"yanhaiproject/tool"
+	log "github.com/sirupsen/logrus"
 )
 
 type SchoolGroupController struct {
@@ -35,23 +37,46 @@ type groupDetail struct {
 	TopicList         []retTopicInDetail `json:"topicList"`
 }
 
+type groupSummary struct {
+	PortraitURL  string   `json:"portraitURL"`
+	School       string   `json:"school"`
+	ResourceNum  string   `json:"resourceNum"`
+	ResourceList []string `json:"resourceList"`
+	TopicNum     string   `json:"topicNum"`
+	TopicList    []string `json:"topicList"`
+}
+
+type groupList struct {
+	Status     string `json:"status"`
+	HotListNum int `json:"hotListNum"`
+	HotList    []groupSummary `json:"hotList"`
+	GroupListNum int `json:"groupListNum"`
+	GroupList    []groupSummary `json:"groupList"`
+}
 func (con SchoolGroupController) GetGroupList(context *gin.Context)  {
+	//var list groupList
+	//list.Status = "success"
+	//list.HotListNum = 2
+	//list.HotList = make([]groupSummary, list.HotListNum)
+	////直接固定热度数据
+	//list.HotList[0].School = "清华大学"
+	//list.HotList[0].PortraitURL =
 
 }
 
 
-//FIXME  等待测试
 func (con SchoolGroupController) GetGroupDetail(context *gin.Context)  {
 	groupId := context.Param("groupId")
-	userId := context.Query("context")
+	userId := context.Query("userId")
 
-	//FIXME 等待上传接口与图片搭建完毕后修改
 	var retGroupDetail groupDetail
-	retGroupDetail.SchoolPortraitURL = "http://www.xxx.com"
+	//retGroupDetail.SchoolPortraitURL = "http://www.xxx.com"
 	//查询出该小组相关信息
 	var group model.Group
 	iGroupId, _ := strconv.Atoi(groupId)
 	core.DB.First(&group, iGroupId)
+	log.Info("查到的group是。。。")
+	log.Info(group)
 	retGroupDetail.School = group.GroupSchool
 	retGroupDetail.ResourceNum = 2
 	retGroupDetail.ResourceList = []string{retGroupDetail.School + "上岸技巧", retGroupDetail.School + "考研资料"}
@@ -73,7 +98,8 @@ func (con SchoolGroupController) GetGroupDetail(context *gin.Context)  {
 		var creator model.User
 		core.DB.First(&creator)
 		retTopicInDetails[index].Nickname = creator.Nickname
-		retTopicInDetails[index].Portrait = "http://xxx.xxx.com"
+		//TODO 用户头像 等待测试
+		retTopicInDetails[index].Portrait = service.PictureService{}.PicIdToURL(creator.PortraitId)
 		retTopicInDetails[index].Title = topic.Title
 		retTopicInDetails[index].Tag = topic.Tag
 		//插入评论查询
@@ -81,6 +107,7 @@ func (con SchoolGroupController) GetGroupDetail(context *gin.Context)  {
 		retTopicInDetails[index].Summary = topic.Content
 	}
 	retGroupDetail.TopicList = retTopicInDetails
+	retGroupDetail.SchoolPortraitURL = service.PictureService{}.PicIdToURL(group.GroupPicId)
 	retGroupDetail.Status = "success"
 	context.JSON(http.StatusOK,retGroupDetail)
 }

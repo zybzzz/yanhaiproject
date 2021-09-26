@@ -1,7 +1,7 @@
 database:
   user: root
   password: zyb629225
-  server: 127.0.0.1
+  server: 47.96.230.189
   port: 3306
   dbName: yanhai
 
@@ -12,3 +12,5 @@ runenv: dev
 picpath:
   devpath: ./testpic/
   prodpath: /home/yanhaipic/
+
+port: 8080

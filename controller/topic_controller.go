@@ -4,11 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"strconv"
-	"strings"
 	"time"
 	"yanhaiproject/core"
 	"yanhaiproject/model"
+	"yanhaiproject/service"
 )
 
 type TopicController struct {
@@ -61,16 +60,7 @@ func (con TopicController) GetTopicDetail(context *gin.Context)  {
 	}
 	retTopicDetail.Nickname = user.Nickname
 	//获得头像URL
-	var portraitPic model.Picture
-	result = core.DB.First(&portraitPic, user.PortraitId)
-	if result.Error != nil {
-		log.Error(result.Error.Error())
-		context.JSON(http.StatusOK, gin.H{
-			"status": "fail",
-		})
-		return
-	}
-	retTopicDetail.PortraitURL = portraitPic.PicURL
+	retTopicDetail.PortraitURL = service.PictureService{}.PicIdToURL(user.PortraitId)
 
 	retTopicDetail.CreateTime = topic.CreateAt.Format("2006-01-02")
 	retTopicDetail.Title = topic.Title
@@ -78,18 +68,19 @@ func (con TopicController) GetTopicDetail(context *gin.Context)  {
 	retTopicDetail.ThumpUp = topic.ThumpUp
 
 	//获取返回的图片列表
-	//FIXME 增加对图片路径的拼接
-	topicPicIds := strings.Split(topic.PicId, "|")
-	picIds := make([]int, len(topicPicIds))
-	for index, str := range topicPicIds{
-		picIds[index],_ = strconv.Atoi(str)
-	}
-	var topicPics []model.Picture
-	core.DB.Find(&topicPics, picIds)
-	retPictureURLs := make([]string, len(topicPics))
-	for index, pic := range topicPics{
-		retPictureURLs[index] = pic.PicURL
-	}
+	//TODO 获取关注圈子的头像URL 等待测试
+	//topicPicIds := strings.Split(topic.PicId, "|")
+	//picIds := make([]int, len(topicPicIds))
+	//for index, str := range topicPicIds{
+	//	picIds[index],_ = strconv.Atoi(str)
+	//}
+	//var topicPics []model.Picture
+	//core.DB.Find(&topicPics, picIds)
+	//retPictureURLs := make([]string, len(topicPics))
+	//for index, pic := range topicPics{
+	//	retPictureURLs[index] = pic.PicURL
+	//}
+	retPictureURLs := service.PictureService{}.PicIdsToURL(topic.PicId)
 	retTopicDetail.PicURLList = retPictureURLs
 
 

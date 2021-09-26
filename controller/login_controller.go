@@ -16,14 +16,13 @@ type LoginController struct {
 
 func (con LoginController) Login(context *gin.Context)  {
 	var user model.User
-	bodyJson := make(map[string]interface{})
-	context.BindJSON(&bodyJson)
-	log.Info(bodyJson)
-	core.DB.Where("user_id = ?", bodyJson["userId"]).First(&user)
+	userId := context.Query("userId")
+	password := context.Query("password")
+	core.DB.Where("user_id = ?", userId).First(&user)
 	log.Info("查询出的user..." )
 	log.Info(user)
 	//TODO 暂时没有对数据库user为空的情况进行判断
-	if user.Password == bodyJson["password"] {
+	if user.Password == password {
 		context.JSON(http.StatusOK, gin.H{
 			"status": "success",
 			"userId": user.UserId,
@@ -42,8 +41,10 @@ func (con LoginController) Register(context *gin.Context)  {
 	}else {
 		log.Info("register 请求中的user")
 		log.Info(user)
-		result := core.DB.Omit("Gender", "PortraitId", "AttentionId").Create(&user)
-		if result.Error != nil {
+		//FIXME 此处忽略了一堆属性
+		user.PortraitId = 1
+		result := core.DB.Omit( "AttentionId").Create(&user)
+		if result.Error == nil {
 			log.Info("注册数据插入成功")
 			context.JSON(http.StatusOK, gin.H{
 				"status": "success",

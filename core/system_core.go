@@ -59,3 +59,5 @@ func init()  {
 	}
 	log.Info("数据库连接成功")
 }
+
+const URL_PREFIX = "http://47.96.230.189:9225/pics/"

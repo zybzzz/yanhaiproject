@@ -5,6 +5,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"yanhaiproject/core"
 	"yanhaiproject/middlewares"
 	"yanhaiproject/router"
 	log "github.com/sirupsen/logrus"
@@ -17,5 +18,6 @@ func main() {
 	router.ApiV1RouterInit(engine)
 
 	//FIXME 补充端口信息
-	engine.Run()
+	runport := ":" + core.ApplicationConfig.GetString("port")
+	engine.Run(runport)
 }

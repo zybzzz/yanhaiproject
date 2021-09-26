@@ -40,6 +40,10 @@ func (con UserController) GetMyReleaseList(context *gin.Context)  {
 	userId := context.Query("userId")
 	log.Info("获取到的用户id")
 	log.Info(userId)
+	//获取用户的头像数据
+	var user model.User
+	core.DB.First(&user, userId)
+	userPortrait := service.PictureService{}.PicIdToURL(user.PortraitId)
 	//从用户关注的专业和关注的学校给用户推荐帖子
 	var topics []model.Topic
 	result := core.DB.Where("creator = ?", userId).Find(&topics)
@@ -58,8 +62,7 @@ func (con UserController) GetMyReleaseList(context *gin.Context)  {
 		retTopics[index].ThumpUp = topic.ThumpUp
 		//FIXME 暂时写死 在评论的时候直接设置字段自增 等待优化
 		retTopics[index].RecommendNum = 20
-		//FIXME 等待数据库更新造用户的头像数据
-		retTopics[index].Portrait = "http://xxx.xxx.xxx"
+		retTopics[index].Portrait = userPortrait
 	}
 
 	context.JSON(http.StatusOK, gin.H{

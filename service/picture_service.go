@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"strconv"
+	"strings"
 	"yanhaiproject/core"
 	"yanhaiproject/model"
 	"yanhaiproject/tool"
@@ -25,8 +26,9 @@ type PictureService struct {
  * @return 图片URL
  **/
 func (PictureService) PicIdToURL(picId int) string {
-	//FIXME 接口待完成
-	return "http://www.xxx.xxx"
+	var picture model.Picture
+	core.DB.First(&picture, picId)
+	return core.URL_PREFIX + picture.PicURL
 }
 
 
@@ -38,8 +40,19 @@ func (PictureService) PicIdToURL(picId int) string {
  * @return URL的切片
  **/
 func (PictureService) PicIdsToURL(picIds string) []string  {
-	//FIXME 检查返回值为切片类型，尚不确定切片类型的返回值该怎么返回
-	return []string{}
+	//TODO 返回字符串切片类型，带测试
+	allPicIds := strings.Split(picIds, "|")
+	iPicIds := make([]int, len(allPicIds))
+	for index, str := range allPicIds{
+		iPicIds[index],_ = strconv.Atoi(str)
+	}
+	var topicPics []model.Picture
+	core.DB.Find(&topicPics, picIds)
+	retPictureURLs := make([]string, len(topicPics))
+	for index, pic := range topicPics{
+		retPictureURLs[index] = core.URL_PREFIX + pic.PicURL
+	}
+	return retPictureURLs
 }
 
 
@@ -50,17 +63,18 @@ func (PictureService) PicIdsToURL(picIds string) []string  {
  * @param context 上下文
  * @return mess 回传消息 isSuccess是否上传成功
  **/
-func StorePictures(context *gin.Context) (mess string, isSuccess bool, ids []int) {
+func StorePictures(context *gin.Context) (mess string, isSuccess bool, ids []int, urls []string) {
 	//接口测试通过
 	//提前构造存储目录
 	runenv := core.ApplicationConfig.GetString("runenv")
 	var dirPath string
 	if runenv == "dev" {
 		dirPath = core.ApplicationConfig.GetString("picpath.devpath")
-	} else if dirPath == "prod" {
+	} else if runenv == "prod" {
 		dirPath = core.ApplicationConfig.GetString("picpath.prodpath")
 	}else {
-		mess = "文件服务器出错"
+		log.Debug("初始化文件服务器路径出错")
+		mess = "文件服务器出错,获取配置信息出错"
 		isSuccess = false
 		return
 	}
@@ -69,6 +83,7 @@ func StorePictures(context *gin.Context) (mess string, isSuccess bool, ids []int
 	files := form.File["files"]
 	//创建等同长度的数据用来存储文件存储成功之后返回的id
 	picIds := make([]int, len(files))
+	urls = make([]string,len(files))
 	for index, file := range files{
 		//获取判断扩展名是否合法
 		extName := path.Ext(file.Filename)
@@ -80,9 +95,11 @@ func StorePictures(context *gin.Context) (mess string, isSuccess bool, ids []int
 		}
 
 		if _, isAllow := allowExtMap[extName]; !isAllow {
+			log.Debug("文件后缀名不合法")
 			mess = "文件名称不合法"
 			isSuccess = false
 			ids = nil
+			urls = nil
 			return
 		}
 
@@ -92,9 +109,10 @@ func StorePictures(context *gin.Context) (mess string, isSuccess bool, ids []int
 
 		if err:= os.MkdirAll(createDirPath, 0777); err != nil{
 			log.Error(err)
-			mess = "文件服务器出错"
+			mess = "文件服务器出错，创建文件夹出错"
 			isSuccess = false
 			ids = nil
+			urls = nil
 			return
 		}
 
@@ -108,6 +126,7 @@ func StorePictures(context *gin.Context) (mess string, isSuccess bool, ids []int
 			mess = "存储失败"
 			isSuccess = false
 			ids = nil
+			urls = nil
 			log.Error(err)
 			return
 		}else {
@@ -118,7 +137,8 @@ func StorePictures(context *gin.Context) (mess string, isSuccess bool, ids []int
 			log.Info(picture.PicURL)
 			core.DB.Create(&picture)
 			picIds[index] = picture.PicId
+			urls[index] = core.URL_PREFIX + picture.PicURL
 		}
 	}
-	return "成功",true, picIds
+	return "成功",true, picIds, urls
 }
