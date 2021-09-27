@@ -15,6 +15,7 @@ type UserService struct {
 }
 
 type attention struct {
+	GroupId           int `json:"groupId"`
 	School            string `json:"school"`
 	SchoolPortraitURL string `json:"schoolPortraitURL"`
 }
@@ -52,7 +53,7 @@ func (UserService) GetUserMessByUserId(userId string) (string, bool) {
 	retmess.School = user.School
 	retmess.Major = user.Major
 	retmess.PortraitURL = PictureService{}.PicIdToURL(user.PortraitId)
-	attentionList := GroupService{}.getAttentionList("|")
+	attentionList := GroupService{}.getAttentionList(user.AttentionId)
 	retmess.AttentionListSize = len(attentionList)
 	retmess.AttentionList = attentionList
 	bytejson, err := json.Marshal(retmess)

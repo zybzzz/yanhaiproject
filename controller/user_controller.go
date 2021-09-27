@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"strings"
 	"yanhaiproject/core"
 	"yanhaiproject/model"
 	"yanhaiproject/service"
@@ -56,6 +57,9 @@ func (con UserController) GetMyReleaseList(context *gin.Context)  {
 	for index , topic := range topics{
 		retTopics[index].TopicId = topic.TopicId
 		retTopics[index].Creator = topic.Creator
+		var creator model.User
+		core.DB.First(&creator, topic.Creator)
+		retTopics[index].Nickname = creator.Nickname
 		retTopics[index].Title = topic.Title
 		retTopics[index].Content = topic.Content
 		retTopics[index].CreateTime = topic.CreateAt.Format("2006-01-02 15:04:05")
@@ -63,6 +67,8 @@ func (con UserController) GetMyReleaseList(context *gin.Context)  {
 		//FIXME 暂时写死 在评论的时候直接设置字段自增 等待优化
 		retTopics[index].RecommendNum = 20
 		retTopics[index].Portrait = userPortrait
+		retTopics[index].Tag = strings.Split(topic.Tag, "|")
+		retTopics[index].TopicPictures = service.PictureService{}.PicIdsToURL(topic.PicId)
 	}
 
 	context.JSON(http.StatusOK, gin.H{

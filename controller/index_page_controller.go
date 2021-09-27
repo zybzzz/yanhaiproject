@@ -17,12 +17,14 @@ type IndexPageController struct {
 type retTopic struct {
 	TopicId  int `json:"topicId"`
 	Creator  string `json:"creator"`
+	Nickname string `json:"nickname"`
 	Title    string `json:"title"`
 	Content  string `json:"content"`
 	CreateTime string `json:"createTime"`
 	ThumpUp  int `json:"thumpUp"`
-	Tag      string `json:"tag"`
+	Tag      []string `json:"tag"`
 	RecommendNum int `json:"recommendNum"`
+	TopicPictures []string `json:"topicPictures"`
 	Portrait string `json:"portrait"`
 }
 
@@ -46,10 +48,13 @@ func (con IndexPageController) GetRecommendList(context *gin.Context)  {
 		retTopics[index].Content = topic.Content
 		retTopics[index].CreateTime = topic.CreateAt.Format("2006-01-02 15:04:05")
 		retTopics[index].ThumpUp = topic.ThumpUp
+		retTopics[index].Tag = strings.Split(topic.Tag, "|")
 		//FIXME 暂时写死 在评论的时候直接设置字段自增 等待优化
 		retTopics[index].RecommendNum = 20
 		var creator model.User
-		core.DB.First(&creator, retTopic{}.Creator)
+		core.DB.First(&creator, topic.Creator)
+		retTopics[index].Nickname = creator.Nickname
+		retTopics[index].TopicPictures = service.PictureService{}.PicIdsToURL(topic.PicId)
 		retTopics[index].Portrait = service.PictureService{}.PicIdToURL(creator.PortraitId)
 	}
 
@@ -89,8 +94,11 @@ func (con IndexPageController) GetAttentionList(context *gin.Context)  {
 		retTopics[index].ThumpUp = topic.ThumpUp
 		//FIXME 暂时写死 在评论的时候直接设置字段自增 等待优化
 		retTopics[index].RecommendNum = 20
+		retTopics[index].Tag = strings.Split(topic.Tag, "|")
 		var creator model.User
-		core.DB.First(&creator, retTopic{}.Creator)
+		core.DB.First(&creator, topic.Creator)
+		retTopics[index].Nickname = creator.Nickname
+		retTopics[index].TopicPictures = service.PictureService{}.PicIdsToURL(topic.PicId)
 		retTopics[index].Portrait = service.PictureService{}.PicIdToURL(creator.PortraitId)
 	}
 

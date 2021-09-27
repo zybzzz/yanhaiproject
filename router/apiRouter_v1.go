@@ -19,6 +19,8 @@ func ApiV1RouterInit(engine *gin.Engine)  {
 		apiV1Router.GET("/getRecommendList", controller.IndexPageController{}.GetRecommendList)
 		//	获取关注列表
 		apiV1Router.GET("/getAttentionList", controller.IndexPageController{}.GetAttentionList)
+		// 关注圈子
+		apiV1Router.POST("/changeAttendStatus/:userId/:groupId", controller.SchoolGroupController{}.ChangeAttendStatus)
 		//	获取圈子列表
 		apiV1Router.GET("/getGroupList", controller.SchoolGroupController{}.GetGroupList)
 		//	获取具体圈子信息

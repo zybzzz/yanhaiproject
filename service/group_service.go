@@ -32,6 +32,7 @@ func (GroupService) getAttentionList(groupIds string) (list []attention) {
 	core.DB.Find(&groups, iGroupIds)
 	for _, group := range groups{
 		list = append(list, attention{
+			GroupId:           group.GroupId,
 			School:            group.GroupSchool,
 			SchoolPortraitURL: PictureService{}.PicIdToURL(group.GroupPicId),
 		})

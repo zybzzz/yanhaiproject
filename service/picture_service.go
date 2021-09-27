@@ -47,7 +47,7 @@ func (PictureService) PicIdsToURL(picIds string) []string  {
 		iPicIds[index],_ = strconv.Atoi(str)
 	}
 	var topicPics []model.Picture
-	core.DB.Find(&topicPics, picIds)
+	core.DB.Find(&topicPics, iPicIds)
 	retPictureURLs := make([]string, len(topicPics))
 	for index, pic := range topicPics{
 		retPictureURLs[index] = core.URL_PREFIX + pic.PicURL
