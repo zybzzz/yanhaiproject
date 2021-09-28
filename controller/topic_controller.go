@@ -104,9 +104,9 @@ func (con TopicController) GetTopicDetail(context *gin.Context) {
 			})
 			return
 		}
-		retComments[index].PortraitURL = portraitPic.PicURL
+		retComments[index].PortraitURL = core.URL_PREFIX + portraitPic.PicURL
 		retComments[index].ThumpUp = 12323
-		retComments[index].CreateTime = "2021-21-12"
+		retComments[index].CreateTime = "2021-09-25"
 	}
 	retTopicDetail.CommentList = retComments
 	retTopicDetail.CommentListSize = len(retComments)
